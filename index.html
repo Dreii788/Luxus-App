@@ -359,7 +359,7 @@
     const firebaseConfig = {
         apiKey: "AIzaSyBtEMKwjC3j1DUwqIiuz9BEDOzwzrFSYCE",
         authDomain: "luxus-app-df73d.firebaseapp.com",
-        databaseURL: "https://luxus-app-df73d-default-rtdb.firebaseio.com",
+        databaseURL: "https://luxus-app-df73d-default-rtdb.asia-southeast1.firebasedatabase.app",
         projectId: "luxus-app-df73d",
         storageBucket: "luxus-app-df73d.firebasestorage.app",
         messagingSenderId: "918344569535",
@@ -386,7 +386,7 @@
     }
 
     function viewDetails(name, img, price) {
-        currentShoeName = name; // Store name for Firebase
+        currentShoeName = name;
         document.getElementById('detail-name').innerText = name;
         document.getElementById('detail-img').src = img;
         document.getElementById('detail-price').innerText = price;
