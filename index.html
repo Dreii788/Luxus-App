@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXUS</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #121212; display: flex; justify-content: center; align-items: center; min-height: 100vh; color: #333; }
+
+        .phone-frame {
+            width: 395px; height: 850px;
+            background-color: #939597;
+            border: 12px solid #1a1a1a;
+            border-radius: 55px;
+            position: relative;
+            overflow: hidden;
+            display: flex; flex-direction: column;
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+        }
+
+        .dynamic-island {
+            position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+            width: 115px; height: 35px; background: black; border-radius: 20px; z-index: 100;
+        }
+
+        .status-bar {
+            height: 50px; padding: 0 35px; display: flex; justify-content: space-between; align-items: center;
+            font-size: 16px; font-weight: bold; position: absolute; top: 0; width: 100%; z-index: 90; color: #000;
+        }
+
+        .screen-container { flex: 1; position: relative; overflow: hidden; margin-top: 50px; margin-bottom: 65px; }
+        .app-screen { position: absolute; width: 100%; height: 100%; display: none; flex-direction: column; overflow-y: auto; }
+        .app-screen.active { display: flex; }
+        .menu-page-header { padding: 15px 25px; font-size: 20px; font-weight: bold; background: white; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 15px; }
+        .menu-page-content { padding: 20px; background: #f9f9f9; flex: 1; }
+        .list-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+
+        #screen-login { background-color: #3e414c; color: white; text-align: center; padding-top: 80px; }
+        .login-welcome { font-size: 45px; font-weight: 300; line-height: 1.1; margin-bottom: 20px; }
+        .login-hub { position: relative; height: 280px; display: flex; justify-content: center; align-items: center; }
+        .big-lux-text { font-size: 160px; font-weight: 900; color: #d4af37; opacity: 0.6; font-family: serif; position: absolute; }
+        .login-label { position: relative; z-index: 5; font-size: 40px; margin-top: 20px; }
+        .social-row { display: flex; justify-content: center; gap: 20px; margin-top: 10px; z-index: 10; }
+        .s-btn { width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; font-size: 30px; }
+        .fb { background: #1877f2; color: white; }
+        .go { background: white; color: #db4437; border: 1px solid #ddd; }
+        .lx { background: transparent; border: 2px solid #d4af37; color: #d4af37; font-family: serif; }
+        .login-footer { position: absolute; bottom: 40px; width: 100%; color: #3498db; font-size: 14px; display: flex; justify-content: center; gap: 10px; }
+        .home-header-content { padding: 5px 25px 10px; }
+        .home-loc-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .home-loc-text h4 { font-size: 18px; color: #111; font-weight: 700;}
+        .home-loc-text p { font-size: 13px; color: #444; }
+        .home-header-icons { display: flex; gap: 15px; align-items: center; font-size: 26px; }
+        .home-cart-box { position: relative; cursor: pointer; }
+        .home-badge { position: absolute; top: -5px; right: -5px; background: #3498db; color: white; font-size: 10px; padding: 2px 5px; border-radius: 10px; }
+        .home-search-bar { background: white; border-radius: 30px; height: 45px; display: flex; align-items: center; padding: 0 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .home-search-bar input { border: none; outline: none; margin-left: 10px; font-size: 16px; color: #333; width: 100%; }
+        .home-main-app { background: white; border-radius: 35px 35px 0 0; flex: 1; padding: 25px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
+        .home-card { display: flex; flex-direction: column; overflow: hidden; border-radius: 15px; cursor: pointer; transition: transform 0.2s; background: #f8f8f8;}
+        .home-card:active { transform: scale(0.95); }
+        .home-card img { width: 100%; height: 110px; object-fit: contain; padding: 10px; }
+        .home-card-label { background: #e0e0e0; padding: 10px 5px; text-align: center; font-size: 14px; font-weight: 600; min-height: 50px; display: flex; align-items: center; justify-content: center; }
+
+        #screen-cart { background: #f1f1f1; }
+        .cart-header { padding: 15px 20px; text-align: center; font-weight: bold; font-size: 20px; position: relative; background: white; }
+        .sort-row { text-align: right; padding: 10px 20px; font-size: 13px; color: #666; }
+        .cart-card { background: white; margin: 0 20px 15px; padding: 15px; border-radius: 20px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .cart-img-box { background: #f9f9f9; padding: 5px; border-radius: 12px; width: 80px; height: 80px; display: flex; align-items: center; }
+        .cart-img-box img { width: 100%; object-fit: contain; }
+        .cart-details { flex: 1; }
+        .cart-details h4 { font-size: 15px; margin-bottom: 2px; }
+        .cart-details p { font-size: 11px; color: #888; }
+        .qty-control { display: flex; align-items: center; gap: 12px; margin-right: 10px; }
+        .qty-btn { color: #f1c40f; font-size: 22px; cursor: pointer; font-weight: bold; }
+        .cart-price { font-weight: bold; font-size: 15px; color: #000; }
+        .discount-section { display: flex; background: white; margin: 10px 20px; border-radius: 15px; padding: 15px; justify-content: space-between; align-items: center; }
+        .discount-input { border: none; outline: none; flex: 1; color: #333; font-size: 14px; }
+        .apply-btn { color: #f1c40f; font-weight: bold; cursor: pointer; }
+        .proceed-btn { background: #f1c40f; color: white; width: 85%; height: 55px; border: none; border-radius: 15px; margin: 20px auto; font-weight: bold; font-size: 18px; cursor: pointer; }
+        .details-img-viewer { height: 350px; background: white; margin: 15px; border-radius: 25px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .details-img-viewer img { width: 80%; object-fit: contain; }
+        .details-info-section { padding: 0 25px; flex: 1; }
+        .details-price { font-size: 30px; font-weight: 800; color: #000; }
+        .details-size-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; margin-bottom: 20px; }
+        .details-size-btn { padding: 10px 18px; border: 1px solid #ddd; border-radius: 10px; background: white; cursor: pointer; font-weight: 600; }
+        .details-size-btn.selected { background: #333; color: white; border-color: #333; }
+        .details-footer-btns { display: flex; gap: 15px; padding: 20px; background: white; }
+        .btn-cart-footer { flex: 0 0 70px; background: #7fcdcd; border: none; border-radius: 15px; height: 60px; font-size: 25px; cursor: pointer; }
+        .btn-buy-footer { flex: 1; background: #00ffff; border: none; border-radius: 15px; font-weight: bold; font-size: 18px; cursor: pointer; }
+
+        #menu-overlay {
+            position: absolute; top: 0; right: -100%; width: 80%; height: 100%;
+            background: white; z-index: 200; transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); padding: 50px 25px; box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+        }
+        #menu-overlay.open { right: 0; }
+        .circle-x { width: 40px; height: 40px; background: #f0f0f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer; position: absolute; top: 20px; right: 20px; }
+        .profile-row { display: flex; align-items: center; gap: 15px; margin-top: 40px; margin-bottom: 40px; }
+        .profile-row img { width: 60px; height: 60px; border-radius: 50%; background: #eee; object-fit: cover; border: 2px solid #f1c40f; }
+        .menu-item { padding: 18px 0; font-size: 18px; font-weight: 500; border-bottom: 1px solid #f5f5f5; color: #333; cursor: pointer; }
+
+        #screen-summary { background: white; }
+        .summary-header { text-align: center; padding: 15px; font-weight: bold; font-size: 18px; border-bottom: 1px solid #eee; }
+        .summary-address-block { padding: 20px 25px; font-size: 14px; background: #fffdf5; border-bottom: 5px solid #f1f1f1; }
+        .summary-item-card { display: flex; gap: 15px; padding: 15px 25px; border-bottom: 1px solid #f1f1f1; }
+        .summary-item-card img { width: 70px; height: 70px; object-fit: contain; }
+        .summary-breakdown { padding: 20px 25px; }
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        .btn-place-order { background: #00ffff; width: 85%; margin: 20px auto; height: 55px; border-radius: 30px; border: none; font-weight: bold; font-size: 18px; cursor: pointer; }
+
+        #screen-success { background: #939597; align-items: center; justify-content: center; text-align: center; }
+        .success-check { width: 100px; height: 100px; background: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 50px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3); }
+        .btn-close-success { background: white; border: none; padding: 15px 50px; border-radius: 30px; font-weight: bold; margin-top: 30px; cursor: pointer; }
+
+        .android-nav { height: 65px; background: white; border-top: 1px solid #eee; display: flex; justify-content: space-around; align-items: center; position: absolute; bottom: 0; width: 100%; z-index: 100; }
+        .nav-icon { font-size: 22px; cursor: pointer; color: #555; }
+        .nav-square-btn { width: 22px; height: 22px; border: 2px solid #555; border-radius: 4px; cursor: pointer; }
+        
+        .clickable:active { opacity: 0.7; scale: 0.98; }
+    </style>
+</head>
+<body>
+
+<div class="phone-frame">
+    <div class="dynamic-island"></div>
+    <div id="menu-overlay">
+        <div class="circle-x clickable" onclick="toggleMenu()">×</div>
+        <div class="profile-row">
+            <img src="images/emman%20pic.jpg" alt="Profile">
+            <div style="flex:1">
+                <p style="font-size: 14px; color: #888;">Welcome back,</p>
+                <b style="font-size: 18px;">Emmanuel</b>
+            </div>
+        </div>
+        <div class="menu-item clickable" onclick="navigateTo('screen-orders'); toggleMenu();">My Orders</div>
+        <div class="menu-item clickable" onclick="navigateTo('screen-payment'); toggleMenu();">Payment Methods</div>
+        <div class="menu-item clickable" onclick="navigateTo('screen-vouchers'); toggleMenu();">Vouchers</div>
+        <div class="menu-item clickable" onclick="navigateTo('screen-settings'); toggleMenu();">Settings</div>
+        <div class="menu-item clickable" style="color: #e74c3c; margin-top: 20px;" onclick="logOut()">Log Out</div>
+    </div>
+    
+    <div class="status-bar">
+        <div>12:16</div>
+        <div style="display:flex; gap:8px;">🔔 📶 🔋</div>
+    </div>
+
+    <div class="screen-container">
+        <section id="screen-login" class="app-screen active">
+            <div class="login-welcome">Welcome to<br>Luxus</div>
+            <div class="login-hub">
+                <div class="big-lux-text">LUX</div>
+                <div class="login-label">Login to:</div>
+            </div>
+            <div class="social-row">
+                <div class="s-btn fb clickable" onclick="navigateTo('screen-home')">f</div>
+                <div class="s-btn go clickable" onclick="navigateTo('screen-home')">G</div>
+                <div class="s-btn lx clickable" onclick="navigateTo('screen-home')">LUX</div>
+            </div>
+            <div class="login-footer">
+                <span class="clickable">Switch Account</span>
+                <span style="color:white">•</span>
+                <span class="clickable">Trouble signing in?</span>
+            </div>
+        </section>
+
+        <section id="screen-home" class="app-screen">
+            <div class="home-header-content">
+                <div class="home-loc-section">
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <span style="color:#e74c3c; font-size:24px;">📍</span>
+                        <div class="home-loc-text">
+                            <h4>Home</h4>
+                            <p>La Madonna Dormitory</p>
+                        </div>
+                    </div>
+                    <div class="home-header-icons">
+                        <div class="home-cart-box clickable" onclick="navigateTo('screen-cart')">
+                            🛒<span class="home-badge" id="cart-count">2</span>
+                        </div>
+                        <span class="clickable" onclick="toggleMenu()" style="font-size: 30px;">≡</span>
+                    </div>
+                </div>
+                <div class="home-search-bar">
+                    <span style="color:#3498db;">🔍</span>
+                    <input type="text" id="main-search" placeholder="Search LUXUS..." onkeyup="filterShoes()">
+                </div>
+            </div>
+            <div class="home-main-app" id="shoe-list">
+                <div class="home-card clickable" onclick="viewDetails('Air Jordan 1 Low', 'images/air%20jordan%201%20low.jpg', '₱ 1,199')">
+                    <img src="images/air%20jordan%201%20low.jpg">
+                    <div class="home-card-label">Air Jordan 1 Low</div>
+                </div>
+                <div class="home-card clickable" onclick="viewDetails('Nike Dunk', 'images/dunk.jpg', '₱ 1,299')">
+                    <img src="images/dunk.jpg">
+                    <div class="home-card-label">Nike Dunk</div>
+                </div>
+                <div class="home-card clickable" onclick="viewDetails('Air Force 1', 'images/airforce%201.jpg', '₱ 1,399')">
+                    <img src="images/airforce%201.jpg">
+                    <div class="home-card-label">Air Force 1</div>
+                </div>
+                <div class="home-card clickable" onclick="viewDetails('Classic Cortez', 'images/cortez.jpg', '₱ 1,099')">
+                    <img src="images/cortez.jpg">
+                    <div class="home-card-label">Classic Cortez</div>
+                </div>
+                <div class="home-card clickable" onclick="viewDetails('Nike Metcon', 'images/metcon.jpg', '₱ 1,499')">
+                    <img src="images/metcon.jpg">
+                    <div class="home-card-label">Nike Metcon</div>
+                </div>
+                <div class="home-card clickable" onclick="viewDetails('Bape Sta', 'images/bapeSta.jpg', '₱ 2,199')">
+                    <img src="images/bapeSta.jpg">
+                    <div class="home-card-label">Bape Sta</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-details" class="app-screen">
+            <div style="padding:15px 25px; font-size:28px; cursor:pointer;" onclick="goBack()">←</div>
+            <div class="details-img-viewer">
+                <img id="detail-img" src="">
+                <span style="position:absolute; bottom:15px; right:20px; background:rgba(0,0,0,0.6); color:white; padding:4px 12px; border-radius:15px; font-size:12px;">1/8</span>
+            </div>
+            <div class="details-info-section">
+                <div class="details-price" id="detail-price">₱ 0</div>
+                <p style="font-weight:bold; font-size: 18px; margin:8px 0;" id="detail-name">Product Name</p>
+                <p style="color:#888; font-size:14px;">⭐️ 4.9 <span style="color:#3498db">(9,231 reviews)</span> | 21.3k sold</p>
+                <p style="margin-top:20px; font-size:15px; font-weight: 600; color:#444;">Select Size (US)</p>
+                <div class="details-size-grid">
+                    <button class="details-size-btn selected">5</button>
+                    <button class="details-size-btn">6</button>
+                    <button class="details-size-btn">7</button>
+                    <button class="details-size-btn">8</button>
+                    <button class="details-size-btn">9</button>
+                    <button class="details-size-btn">10</button>
+                </div>
+            </div>
+            <div class="details-footer-btns">
+                <button class="btn-cart-footer clickable" onclick="addToCart()">🛒</button>
+                <button class="btn-buy-footer clickable" onclick="navigateTo('screen-summary')">Buy Now</button>
+            </div>
+        </section>
+
+        <section id="screen-cart" class="app-screen">
+            <div class="cart-header">
+                <span style="position:absolute; left:20px; cursor:pointer;" onclick="goBack()">←</span>
+                Cart
+            </div>
+            <div class="sort-row">Sort by: <b>Price</b> ∨</div>
+            <div id="cart-items-list">
+                <div class="cart-card">
+                    <div class="cart-img-box">
+                        <img id="cart-main-img" src="">
+                    </div>
+                    <div class="cart-details">
+                        <h4 id="cart-main-name">Air Jordan 1 Low</h4>
+                        <p>Size: US <span id="cart-main-size">5</span> | Color: Mystic</p>
+                        <div class="cart-price" id="cart-main-price" style="margin-top:5px;">₱1,199</div>
+                    </div>
+                    <div class="qty-control">
+                        <span class="qty-btn clickable">–</span>
+                        <span style="font-weight: bold;">1</span>
+                        <span class="qty-btn clickable">+</span>
+                    </div>
+                </div>
+            </div>
+            <div class="discount-section">
+                <input type="text" class="discount-input" placeholder="Enter discount code">
+                <span class="apply-btn clickable">Apply</span>
+            </div>
+            <div style="flex:1"></div> 
+            <button class="proceed-btn clickable" onclick="navigateTo('screen-summary')">Checkout</button>
+        </section>
+
+        <section id="screen-summary" class="app-screen">
+            <div class="summary-header">
+                <span style="position:absolute; left:20px; cursor:pointer;" onclick="goBack()">←</span>
+                Checkout
+            </div>
+            <div class="summary-address-block">
+                <p style="margin-bottom:5px;"><b>Shipping Address</b></p>
+                <p>📍 Emmanuel A. Ubina | (+63) 912 345 6789</p>
+                <p style="color:#666; margin-top:3px;">La Madonna Dormitory, Tamag, Vigan City, Ilocos Sur</p>
+            </div>
+            <div class="summary-item-card">
+                <img id="summary-img" src="">
+                <div style="flex:1">
+                    <p id="summary-name" style="font-weight:bold; font-size:14px;">Air Jordan 1 Low</p>
+                    <p style="color:#888; font-size:12px;">Size: US <span id="summary-size">5</span></p>
+                    <p id="summary-price" style="font-weight:bold; margin-top:5px; color:#e67e22;">₱ 1,199</p>
+                </div>
+            </div>
+            <div class="summary-breakdown">
+                <div class="summary-row"><span>Order Subtotal</span> <span id="subtotal">₱ 1,199.00</span></div>
+                <div class="summary-row"><span>Shipping Fee</span> <span>₱ 25.00</span></div>
+                <div class="summary-row"><span>Voucher Discount</span> <span style="color:#2ecc71;">-₱ 0.00</span></div>
+                <hr style="margin:15px 0; border:0; border-top:1px dashed #ddd;">
+                <div class="summary-row" style="font-size:20px; font-weight:800; color:#000;">
+                    <span>Total Payment</span> <span id="total-pay">₱ 1,224.00</span>
+                </div>
+            </div>
+            <button class="btn-place-order clickable" onclick="navigateTo('screen-success')">Place Order Now</button>
+        </section>
+
+        <section id="screen-success" class="app-screen">
+            <div class="success-check">✓</div>
+            <h2 style="color:white; font-size:24px; margin-bottom:10px;">Order Confirmed!</h2>
+            <p style="color: #ddd; padding: 0 40px; line-height: 1.5;">Your sneakers are being prepared and will be shipped soon.</p>
+            <button class="btn-close-success clickable" onclick="navigateTo('screen-home')">Back to Home</button>
+        </section>
+
+        <section id="screen-orders" class="app-screen">
+            <div class="menu-page-header"><span onclick="goBack()" class="clickable">←</span> My Orders</div>
+            <div class="menu-page-content">
+                <div class="list-item"><div><b>Order #LX-9921</b><p style="font-size:12px; color:#888;">To Receive</p></div><span>₱1,224</span></div>
+                <p style="text-align:center; color:#888; margin-top:20px;">No other recent orders.</p>
+            </div>
+        </section>
+
+        <section id="screen-payment" class="app-screen">
+            <div class="menu-page-header"><span onclick="goBack()" class="clickable">←</span> Payment Methods</div>
+            <div class="menu-page-content">
+                <div class="list-item"><span>💵 Cash On Delivery</span> <span style="color:#2ecc71;">Active</span></div>
+                <div class="list-item"><span>💳 GCash / Maya</span> <span>Link Now</span></div>
+                <button style="width:100%; padding:15px; border-radius:10px; border:1px dashed #ccc; background:none;">+ Add New Card</button>
+            </div>
+        </section>
+
+        <section id="screen-vouchers" class="app-screen">
+            <div class="menu-page-header"><span onclick="goBack()" class="clickable">←</span> My Vouchers</div>
+            <div class="menu-page-content">
+                <div class="list-item" style="border-left:5px solid #f1c40f;"><div><b>FREE SHIPPING</b><p style="font-size:12px; color:#888;">Valid until May 2026</p></div><span style="color:#3498db;">USE</span></div>
+                <p style="text-align:center; color:#888; margin-top:20px;">Check back for more deals!</p>
+            </div>
+        </section>
+
+        <section id="screen-settings" class="app-screen">
+            <div class="menu-page-header"><span onclick="goBack()" class="clickable">←</span> Settings</div>
+            <div class="menu-page-content">
+                <div class="list-item"><span>Edit Profile</span> <span>></span></div>
+                <div class="list-item"><span>Notification Settings</span> <span>></span></div>
+                <div class="list-item"><span>Privacy Policy</span> <span>></span></div>
+                <div class="list-item"><span>App Version</span> <span style="color:#888;">v1.0.4</span></div>
+            </div>
+        </section>
+    </div>
+
+    <div class="android-nav">
+        <span class="nav-icon">☰</span>
+        <div class="nav-square-btn clickable" onclick="navigateTo('screen-home')"></div>
+        <span class="nav-icon clickable" onclick="goBack()">◀️</span>
+    </div>
+</div>
+
+<script>
+    let historyStack = ['screen-login'];
+    let currentCartCount = 2;
+    let selectedSize = "5";
+
+    function navigateTo(screenId) {
+        document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+        const target = document.getElementById(screenId);
+        target.classList.add('active');
+        target.scrollTop = 0; 
+        document.getElementById('menu-overlay').classList.remove('open');
+        
+        if (historyStack[historyStack.length - 1] !== screenId) {
+            historyStack.push(screenId);
+        }
+    }
+
+    function viewDetails(name, img, price) {
+        document.getElementById('detail-name').innerText = name;
+        document.getElementById('detail-img').src = img;
+        document.getElementById('detail-price').innerText = price;
+        document.getElementById('summary-name').innerText = name;
+        document.getElementById('summary-img').src = img;
+        document.getElementById('summary-price').innerText = price;
+        document.getElementById('summary-size').innerText = selectedSize;
+        document.getElementById('cart-main-name').innerText = name;
+        document.getElementById('cart-main-img').src = img;
+        document.getElementById('cart-main-price').innerText = price;
+        document.getElementById('cart-main-size').innerText = selectedSize;
+        document.getElementById('subtotal').innerText = price + ".00";
+        let numPrice = parseInt(price.replace(/[^\d]/g, ''));
+        document.getElementById('total-pay').innerText = "₱ " + (numPrice + 25).toLocaleString() + ".00";
+        navigateTo('screen-details');
+    }
+
+    function filterShoes() {
+        let input = document.getElementById('main-search').value.toLowerCase();
+        let cards = document.querySelectorAll('.home-card');
+        cards.forEach(card => {
+            let name = card.querySelector('.home-card-label').innerText.toLowerCase();
+            card.style.display = name.includes(input) ? "flex" : "none";
+        });
+    }
+
+    function addToCart() {
+        currentCartCount++;
+        document.getElementById('cart-count').innerText = currentCartCount;
+        alert("Added to cart!");
+    }
+
+    function goBack() {
+        if (historyStack.length > 1) {
+            let current = historyStack[historyStack.length - 1];
+            if (current === 'screen-home') return; 
+            historyStack.pop(); 
+            let prevScreen = historyStack[historyStack.length - 1];
+            document.querySelectorAll('.app-screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(prevScreen).classList.add('active');
+        }
+    }
+
+    function toggleMenu() {
+        document.getElementById('menu-overlay').classList.toggle('open');
+    }
+
+    function logOut() {
+        historyStack = ['screen-login'];
+        navigateTo('screen-login');
+    }
+
+    document.querySelectorAll('.details-size-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.details-size-btn').forEach(b => b.classList.remove('selected'));
+            this.classList.add('selected');
+            selectedSize = this.innerText;
+            document.getElementById('summary-size').innerText = selectedSize;
+            document.getElementById('cart-main-size').innerText = selectedSize;
+        });
+    });
+</script>
+
+</body>
+</html>
